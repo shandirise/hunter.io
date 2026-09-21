@@ -69,6 +69,14 @@ EXPOSE 8000
 
 ENV PORT=8000
 ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
+ENV APP_ENV=production
+ENV APP_DEBUG=true
+ENV LOG_CHANNEL=stderr
+ENV APP_KEY=base64:cT4Fjn2g0mZsp6c3LEo7ROFUqTZAYoEwp2n5NssbsWw=
+ENV DB_CONNECTION=sqlite
+ENV DB_DATABASE=/var/www/html/database/database.sqlite
+ENV SESSION_DRIVER=file
 
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
 CMD ["apache2-foreground"]
+
