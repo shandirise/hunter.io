@@ -18,25 +18,16 @@ RUN npm run build
 # ============================================================
 FROM php:8.4-apache AS production
 
-# Install system libraries and PHP extensions
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    libsqlite3-dev \
-    libpq-dev \
-    libzip-dev \
-    zip \
-    unzip \
-    git \
-    curl \
-    && docker-php-ext-install \
-    pdo \
-    pdo_sqlite \
-    pdo_pgsql \
-    pdo_mysql \
-    bcmath \
-    zip \
-    opcache \
+# Install PHP extensions without heavy C compilation overhead
+COPY --from=mlocati/php-extension-installer:latest /usr/bin/install-php-extensions /usr/local/bin/
+RUN install-php-extensions pdo_sqlite pdo_pgsql pdo_mysql bcmath zip \
     && a2enmod rewrite \
+    && apt-get update && apt-get install -y --no-install-recommends git unzip \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Optimize PHP memory limits for 512MB free tier containers
+RUN echo "memory_limit = 128M" > /usr/local/etc/php/conf.d/docker-php-memlimit.ini
+
 
 # Install Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
