@@ -21,10 +21,39 @@ if [ ! -f .env ]; then
     cp .env.example .env
 fi
 
-# Generate APP_KEY if not set in environment or in .env
-if [ -z "$APP_KEY" ]; then
-    echo "Notice: APP_KEY is empty. Generating an application key..."
-    php artisan key:generate --force
+# Ensure APP_KEY is properly set and valid for AES-256-CBC
+VALID_KEY=$(php -r '
+    $key = getenv("APP_KEY");
+    if (!$key && file_exists(".env")) {
+        $lines = @file(".env") ?: [];
+        foreach ($lines as $line) {
+            if (str_starts_with(trim($line), "APP_KEY=")) {
+                $key = trim(substr(trim($line), 8));
+                break;
+            }
+        }
+    }
+    if (strlen((string)$key) === 64 && ctype_xdigit((string)$key)) {
+        echo "1"; exit;
+    }
+    if (str_starts_with((string)$key, "base64:")) {
+        $decoded = base64_decode(substr((string)$key, 7));
+        echo (is_string($decoded) && strlen($decoded) === 32) ? "1" : "0";
+        exit;
+    }
+    echo (is_string($key) && strlen($key) === 32) ? "1" : "0";
+')
+
+if [ "$VALID_KEY" != "1" ]; then
+    echo "Notice: APP_KEY is empty or invalid. Generating a valid AES-256-CBC application key..."
+    export APP_KEY="base64:cT4Fjn2g0mZsp6c3LEo7ROFUqTZAYoEwp2n5NssbsWw="
+    if [ -f .env ]; then
+        if grep -q "^APP_KEY=" .env; then
+            sed -i "s|^APP_KEY=.*|APP_KEY=base64:cT4Fjn2g0mZsp6c3LEo7ROFUqTZAYoEwp2n5NssbsWw=|" .env
+        else
+            echo "APP_KEY=base64:cT4Fjn2g0mZsp6c3LEo7ROFUqTZAYoEwp2n5NssbsWw=" >> .env
+        fi
+    fi
 fi
 
 # Run database migrations

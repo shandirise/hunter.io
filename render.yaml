@@ -15,5 +15,5 @@ services:
       - key: FUNDOR_COOKIE_SECURE
         value: "true"
       - key: APP_KEY
-        generateValue: true
+        value: base64:cT4Fjn2g0mZsp6c3LEo7ROFUqTZAYoEwp2n5NssbsWw=
 

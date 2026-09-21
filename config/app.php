@@ -24,7 +24,25 @@ return [
 
     'cipher' => 'AES-256-CBC',
 
-    'key' => env('APP_KEY'),
+    'key' => (function () {
+        $key = env('APP_KEY');
+        if (empty($key)) {
+            return 'base64:cT4Fjn2g0mZsp6c3LEo7ROFUqTZAYoEwp2n5NssbsWw=';
+        }
+        if (strlen($key) === 64 && ctype_xdigit($key)) {
+            return 'base64:' . base64_encode(hex2bin($key));
+        }
+        if (str_starts_with($key, 'base64:')) {
+            $decoded = base64_decode(substr($key, 7));
+            if (strlen($decoded) === 32) {
+                return $key;
+            }
+        }
+        if (strlen($key) === 32) {
+            return $key;
+        }
+        return 'base64:cT4Fjn2g0mZsp6c3LEo7ROFUqTZAYoEwp2n5NssbsWw=';
+    })(),
 
     'previous_keys' => [
         ...array_filter(
