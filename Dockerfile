@@ -18,13 +18,14 @@ RUN npm run build
 # ============================================================
 FROM php:8.4-apache AS production
 
-# Install system utilities and zip/bcmath extensions
-RUN apt-get update && apt-get install -y --no-install-recommends git unzip \
+# Install system utilities, zip library, and PHP extensions directly via official tools
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git \
+    unzip \
+    libzip-dev \
+    && docker-php-ext-install zip bcmath \
     && a2enmod rewrite \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
-
-COPY --from=mlocati/php-extension-installer:latest /usr/bin/install-php-extensions /usr/local/bin/
-RUN install-php-extensions zip bcmath
 
 # Optimize PHP memory limits for 512MB free tier containers
 RUN echo "memory_limit = 128M" > /usr/local/etc/php/conf.d/docker-php-memlimit.ini
