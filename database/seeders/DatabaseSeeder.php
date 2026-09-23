@@ -24,13 +24,12 @@ class DatabaseSeeder extends Seeder
         $this->call(OpportunitySeeder::class);
 
         // 2. Seed Administrator Account
-        $admin = User::firstOrCreate(
+        $admin = User::updateOrCreate(
             ['username' => 'admin'],
             [
                 'name' => 'Admin User',
-                'username' => 'a',
-                'email' => 'a@a.com',
-                'password' => Hash::make('a'),
+                'email' => 'admin@fundor.hu',
+                'password' => Hash::make('Admin2026!'),
                 'role' => 'admin',
                 'subscription_plan' => 'enterprise',
                 'subscription_expires_at' => now()->addYears(5),
