@@ -60,9 +60,9 @@ fi
 echo "Running database migrations..."
 php artisan migrate --force
 
-# Seed demo opportunities if needed
-echo "Seeding opportunity demo data..."
-php artisan db:seed --class=OpportunitySeeder --force || true
+# Seed database (opportunities, admin user, demo company)
+echo "Seeding initial database records (opportunities, admin, demo profile)..."
+php artisan db:seed --class=DatabaseSeeder --force || true
 
 # CRITICAL: Grant full ownership and write permissions to www-data AFTER all artisan commands have run
 echo "Setting runtime permissions for www-data..."
