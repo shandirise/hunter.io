@@ -32,14 +32,29 @@ class Profiles
 
     public function normalize(array $p): array
     {
-        Validator::make($p, ['company' => 'sometimes|string|max:255', 'employees' => 'sometimes|integer|min:0',
-            'county' => 'sometimes|string|max:100', 'industryId' => 'sometimes|string|max:50',
-            'closed_business_years' => 'sometimes|integer|min:0', 'investment_value' => 'sometimes|numeric|min:0|max:9999999999999',
-            'goals' => 'sometimes|array', 'goals.*' => 'string', 'funding_pref' => 'sometimes|array', 'funding_pref.*' => 'string',
-            'orgType' => 'sometimes|in:sme,large,research,university,ngo,public', 'teaor' => 'sometimes|string|max:10',
-            'initials' => 'sometimes|string|max:10', 'region' => 'sometimes|string|max:10', 'country' => 'sometimes|string|max:10',
-            'revBand' => 'sometimes|string|max:100', 'projectName' => 'sometimes|string|max:255',
-            'de_minimis_ok' => 'sometimes|boolean', 'consortium_ready' => 'sometimes|boolean', 'eu_experience' => 'sometimes|boolean'])->validate();
+        Validator::make($p, [
+            'company' => 'sometimes|string|max:255',
+            'employees' => 'sometimes|integer|min:0',
+            'county' => 'sometimes|string|max:100',
+            'industryId' => 'sometimes|string|max:50',
+            'closed_business_years' => 'sometimes|integer|min:0',
+            'investment_value' => 'sometimes|numeric|min:0|max:9999999999999',
+            'goals' => 'sometimes|array',
+            'goals.*' => 'string',
+            'funding_pref' => 'sometimes|array',
+            'funding_pref.*' => 'string',
+            'orgType' => 'sometimes|nullable|in:sme,large,research,university,ngo,public',
+            'teaor' => 'sometimes|nullable|string|max:10',
+            'initials' => 'sometimes|nullable|string|max:10',
+            'region' => 'sometimes|nullable|string|max:10',
+            'country' => 'sometimes|nullable|string|max:10',
+            'revBand' => 'sometimes|nullable|string|max:100',
+            'projectName' => 'sometimes|nullable|string|max:255',
+            'de_minimis_ok' => 'sometimes|nullable|boolean',
+            'consortium_ready' => 'sometimes|nullable|boolean',
+            'eu_experience' => 'sometimes|nullable|boolean',
+            'taxNumber' => 'sometimes|nullable|string|max:50',
+        ])->validate();
         $p += ['company' => '', 'employees' => 0, 'county' => '', 'industryId' => '', 'closed_business_years' => 0,
             'goals' => [], 'investment_value' => 0, 'funding_pref' => [], 'country' => 'HU'];
         $p['employees'] = (int) $p['employees'];
@@ -112,7 +127,11 @@ class Profiles
             }
             $columns = [];
             foreach (self::MAP as $key => $column) {
-                $columns[$column] = $p[$key] ?? (in_array($key, ['initials', 'projectName', 'de_minimis_ok', 'consortium_ready', 'eu_experience']) ? null : '');
+                $val = $p[$key] ?? null;
+                if ($val === null && ! in_array($key, ['initials', 'projectName', 'de_minimis_ok', 'consortium_ready', 'eu_experience'], true)) {
+                    $val = '';
+                }
+                $columns[$column] = $val;
             }
             $model = $u->companyProfile()->first() ?? new CompanyProfile(['user_id' => $u->id]);
             $model->fill($columns);
