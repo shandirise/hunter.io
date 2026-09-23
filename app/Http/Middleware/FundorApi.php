@@ -19,7 +19,7 @@ class FundorApi
             // A JSON-only mutation protocol plus same-origin browser checks prevents form/login CSRF.
             if (! $request->isMethodSafe()) {
                 $origin = $request->headers->get('Origin') ?: $request->headers->get('Referer');
-                if ($request->headers->get('Sec-Fetch-Site') === 'cross-site' || ($origin && $this->origin($origin) !== $this->origin($request->getSchemeAndHttpHost()))) {
+                if ($request->headers->get('Sec-Fetch-Site') === 'cross-site' || ($origin && ! $this->sameOrigin($origin, $request))) {
                     throw new ApiError('CSRF_REJECTED', 403);
                 }
                 if (! $request->isJson()) {
@@ -54,6 +54,27 @@ class FundorApi
         }
 
         return $response;
+    }
+
+    private function sameOrigin(string $originUrl, Request $request): bool
+    {
+        if ($this->origin($originUrl) === $this->origin($request->getSchemeAndHttpHost())) {
+            return true;
+        }
+
+        $p = parse_url($originUrl);
+        $originHost = strtolower($p['host'] ?? '');
+        $requestHost = strtolower($request->getHost());
+
+        if ($originHost !== '' && $originHost === $requestHost) {
+            $originScheme = strtolower($p['scheme'] ?? '');
+            $requestScheme = strtolower($request->getScheme());
+            if ($originScheme === $requestScheme || $request->isSecure()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private function origin(string $url): string
