@@ -13,6 +13,7 @@ export default defineConfig({
   build: {
     outDir: '../public/spa',
     emptyOutDir: true,
+    chunkSizeWarningLimit: 1500,
   },
   plugins: [react(), tailwindcss()],
   resolve: {
