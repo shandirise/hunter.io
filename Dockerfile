@@ -45,6 +45,7 @@ COPY database/ database/
 COPY routes/ routes/
 COPY public/ public/
 COPY lang/ lang/
+COPY resources/ resources/
 COPY artisan ./
 COPY .env.example .env
 
