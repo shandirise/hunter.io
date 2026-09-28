@@ -1,0 +1,18 @@
+{
+  "shell": {
+    "signOut": "Kijelentkezés",
+    "viewProfile": "Cégprofil megtekintése",
+    "signIn": "Belépés",
+    "notSignedIn": "Nem vagy bejelentkezve",
+    "free": "ingyenes",
+    "subscriber": "előfizető",
+    "admin": "adminisztrátor",
+    "workspace": {
+      "label": "Munkaterület",
+      "client": "Ügyfélnézet",
+      "admin": "Admin",
+      "clientNote": "Azt látod, amit az ügyfél lát.",
+      "adminNote": "Fiókok és előfizetések kezelése."
+    }
+  }
+}
