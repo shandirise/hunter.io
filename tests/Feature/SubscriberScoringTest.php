@@ -4,9 +4,9 @@ namespace Tests\Feature;
 
 use App\Models\Opportunity;
 use App\Models\User;
-use App\Services\Api\Catalog;
-use App\Services\Api\Profiles;
-use App\Services\Api\Scoring;
+use App\Services\Catalog;
+use App\Services\Profiles;
+use App\Services\Scoring;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -38,7 +38,7 @@ class SubscriberScoringTest extends TestCase
         $token = bin2hex(random_bytes(32));
         DB::table('api_sessions')->insert(['token_hash' => hash('sha256', $token), 'user_id' => $u->id, 'expires_at' => now()->addDays(7)]);
 
-        return $this->withCredentials()->withUnencryptedCookie('hunter_session', $token);
+        return $this->withCredentials()->withUnencryptedCookie('fundor_session', $token);
     }
 
     private function account(string $name, string $role = 'user', bool $subscribed = false): User
@@ -56,6 +56,7 @@ class SubscriberScoringTest extends TestCase
         $calls = json_decode(file_get_contents(__DIR__.'/../Fixtures/scoring/catalog.json'), true);
         foreach ($calls as &$call) {
             $call['status'] = 'open';
+            $call['instrument_type'] = 'grant';
         }
         config(['fundor.catalog_feed_url' => 'https://feed.example/catalog.json']);
         Http::fake(['feed.example/*' => Http::response(['opportunities' => $calls])]);

@@ -4,13 +4,14 @@
 FROM node:22-alpine AS frontend-builder
 WORKDIR /build
 
-# Install frontend dependencies
-COPY frontend/package*.json ./frontend/
-WORKDIR /build/frontend
+# Install frontend dependencies (frontend now lives at the repo root: resources/js + src)
+COPY package*.json ./
 RUN npm ci
 
-# Copy frontend source and build SPA into ../public/spa
-COPY frontend/ ./
+# Copy frontend source and build SPA into public/spa (vite root is resources/, outDir ../public/spa)
+COPY vite.config.ts tsconfig.json tsconfig.app.json tsconfig.node.json openapi.yaml ./
+COPY resources/ resources/
+COPY src/ src/
 RUN npm run build
 
 # ============================================================
