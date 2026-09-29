@@ -23,6 +23,9 @@ class DatabaseSeeder extends Seeder
         // 1. Seed initial grant opportunities
         $this->call(OpportunitySeeder::class);
 
+        // 1b. MOCKUP loan products for the deployment demo (sample terms, not reviewed — see LoanMockSeeder)
+        $this->call(LoanMockSeeder::class);
+
         // 2. Seed Administrator Account
         $admin = User::updateOrCreate(
             ['username' => 'admin'],
